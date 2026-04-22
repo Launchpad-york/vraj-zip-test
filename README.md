@@ -1,159 +1,283 @@
-# Launchpad Frontend
+# BSP-WEB Frontend
 
-A modern, responsive dashboard for managing projects, uploading builds, and viewing live applications.
+## Standalone Prototype Mode
 
-## Features
+This folder can run as a standalone clickable prototype with hardcoded in-memory data and no backend dependency.
 
-- **Modern Dashboard**: Clean, intuitive interface with sidebar navigation
-- **Role-based Access**: Different permissions for Admin, Manager, and Client roles
-- **Project Management**: Create, view, and manage projects
-- **Build Upload**: Upload ZIP files and automatically build projects
-- **Live Viewing**: Access live URLs for deployed projects
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
-- **Real-time Updates**: Live status updates and progress tracking
+### What is mocked
+- Authentication/session (no Cognito dependency at runtime)
+- API/network layer (all core modules return local hardcoded data)
+- Chatbot responses (mock streaming + mock non-stream responses)
+- Finance download/send actions (mock blob responses)
+
+### Demo login behavior
+- Email: any valid email format
+- Password:
+  - `verify123` -> opens verification flow
+  - `newpass123` -> opens new-password challenge flow
+  - any other non-empty password -> logs in directly
+
+### Run standalone
+```bash
+# Node 20.19+ required (Vite 7 requirement)
+cd prototype-frontend
+npm install
+npm run dev
+```
+
+A modern React frontend application built with Vite, TypeScript, and Tailwind CSS v4.
 
 ## Tech Stack
 
-- **React 18** - Modern React with hooks
-- **React Router 6** - Client-side routing
-- **Axios** - HTTP client with interceptors
-- **Vite** - Fast build tool and dev server
-- **CSS3** - Modern styling with flexbox and grid
+| Category | Technology |
+|----------|------------|
+| Framework | React 19 |
+| Build Tool | Vite 7 |
+| Language | TypeScript 5.9 |
+| Styling | Tailwind CSS 4 |
+| UI Components | Radix UI + shadcn/ui |
+| State Management | Zustand |
+| Forms | React Hook Form + Yup |
+| Routing | React Router DOM 7 |
+| Icons | Lucide React |
+| Linting/Formatting | Biome |
+| Documentation | Storybook 10 |
+| Design Tokens | Style Dictionary + Tokens Studio |
+
+## Project Structure
+
+```
+frontend/
+├── public/                  # Static assets
+├── src/
+│   ├── api/                 # API client and services
+│   ├── assets/              # Images, fonts, etc.
+│   ├── components/          # React components
+│   │   ├── ui/              # Base UI components (shadcn)
+│   │   └── *.tsx            # Feature components
+│   ├── const/               # Constants and enums
+│   ├── hooks/               # Custom React hooks
+│   ├── layout/              # Layout components
+│   ├── lib/                 # Utility libraries
+│   │   └── utils.ts         # Common utilities (cn, etc.)
+│   ├── pages/               # Page components
+│   ├── routes/              # Route definitions
+│   ├── schemas/             # Yup validation schemas
+│   ├── store/               # Zustand stores
+│   ├── stories/             # Storybook stories
+│   ├── style/               # Additional CSS files
+│   ├── tables/              # Table configurations
+│   ├── tokens/              # Design tokens (auto-generated)
+│   ├── types/               # TypeScript type definitions
+│   ├── utils/               # Helper functions
+│   ├── App.tsx              # Root component
+│   ├── main.tsx             # Entry point
+│   └── index.css            # Global styles
+├── build-tokens.mjs         # Design token build script
+├── biome.json               # Biome configuration
+├── components.json          # shadcn/ui configuration
+├── vite.config.ts           # Vite configuration
+└── package.json
+```
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 16+ 
-- npm or yarn
-- Backend server running on port 5000
+- Node.js 20+
+- pnpm 9+
 
 ### Installation
 
-1. Navigate to the frontend directory:
 ```bash
-cd launchpad-frontend
+# Install dependencies
+pnpm install
+
+# Build design tokens
+pnpm build-tokens
+
+# Start development server
+pnpm dev
 ```
 
-2. Install dependencies:
+The app will be available at `http://localhost:5173`
+
+## Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm preview` | Preview production build |
+| `pnpm lint` | Run Biome linter |
+| `pnpm build-tokens` | Generate CSS from design tokens |
+| `pnpm storybook` | Start Storybook on port 6006 |
+| `pnpm build-storybook` | Build Storybook for deployment |
+
+## Design Tokens
+
+Design tokens are managed using [Tokens Studio](https://tokens.studio/) and compiled with [Style Dictionary](https://amzn.github.io/style-dictionary/).
+
+### Token Structure
+
+```
+src/tokens/
+├── $metadata.json           # Token set order
+├── $themes.json             # Theme definitions
+├── global.json              # Global tokens (spacing, radius)
+├── bsp brand colors/        # Brand color palette
+│   └── Mode 1.json
+├── bsp color modes/         # Theme-specific semantic colors
+│   ├── bsp-light.json
+│   └── bsp-dark.json
+├── shadows/bsp.json         # Shadow definitions
+├── typography/bsp.json      # Typography tokens
+├── border radius/bsp.json   # Border radius tokens
+├── spacing/bsp.json         # Spacing scale
+└── tokens.css               # Generated CSS (do not edit)
+```
+
+### Building Tokens
+
+After modifying any token JSON files, regenerate the CSS:
+
 ```bash
-npm install
+pnpm build-tokens
 ```
 
-3. Start the development server:
+This generates `src/tokens/tokens.css` with CSS custom properties for each theme.
+
+## Theming
+
+The app supports light and dark themes using CSS custom properties.
+
+### Theme Selectors
+
+- **Light theme (default):** `:root` or `:root[data-theme="bsp-light"]`
+- **Dark theme:** `:root[data-theme="bsp-dark"]`
+
+### Switching Themes
+
+```typescript
+// Switch to dark theme
+document.documentElement.setAttribute('data-theme', 'bsp-dark');
+
+// Switch to light theme
+document.documentElement.setAttribute('data-theme', 'bsp-light');
+```
+
+### Using Theme Tokens
+
+```css
+/* Use semantic tokens that adapt to theme */
+.card {
+  background: var(--bspBgBgCard);
+  color: var(--bspTextTextPrimary);
+  border: 1px solid var(--bspBorderBorderPrimary);
+}
+```
+
+## Component Library
+
+UI components are built with [shadcn/ui](https://ui.shadcn.com/) (Radix Vega style) and Radix UI primitives.
+
+### Adding Components
+
 ```bash
-npm run dev
+# Add a shadcn component
+npx shadcn@latest add button
+
+# Components are added to src/components/ui/
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+### Available Components
 
-### Building for Production
+| Component | Path |
+|-----------|------|
+| Alert Dialog | `@/components/ui/alert-dialog` |
+| Badge | `@/components/ui/badge` |
+| Button | `@/components/ui/button` |
+| Card | `@/components/ui/card` |
+| Combobox | `@/components/ui/combobox` |
+| Dropdown Menu | `@/components/ui/dropdown-menu` |
+| Field | `@/components/ui/field` |
+| Input | `@/components/ui/input` |
+| Input Group | `@/components/ui/input-group` |
+| Label | `@/components/ui/label` |
+| Select | `@/components/ui/select` |
+| Separator | `@/components/ui/separator` |
+| Textarea | `@/components/ui/textarea` |
+
+### Path Aliases
+
+```typescript
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { useTheme } from '@/hooks/useTheme';
+```
+
+## Code Quality
+
+### Biome
+
+The project uses [Biome](https://biomejs.dev/) for linting and formatting.
 
 ```bash
-npm run build
+# Check for issues
+pnpm lint
+
+# Auto-fix issues
+npx biome check --write .
 ```
 
-The built files will be in the `dist` directory.
+### Pre-commit Hooks
 
-## Project Structure
+Husky + lint-staged runs Biome on staged files before each commit.
 
+## Testing
+
+### Unit/Integration Tests
 ```
-src/
-├── components/          # Reusable UI components
-│   ├── Dashboard.jsx    # Main dashboard layout
-│   ├── Sidebar.jsx      # Navigation sidebar
-│   ├── DashboardHome.jsx # Dashboard overview
-│   ├── ProjectManagement.jsx # Project CRUD operations
-│   ├── ProjectUpload.jsx # File upload component
-│   └── ProjectView.jsx  # Project viewing and filtering
-├── context/             # React context providers
-│   └── AuthContext.jsx  # Authentication state management
-├── pages/               # Page components
-│   └── LoginPage.jsx    # Login/authentication page
-├── api/                 # API integration
-│   └── index.js         # API functions and axios config
-├── styles/              # Global styles
-│   └── main.css         # Main stylesheet
-└── utils/               # Utility functions
-    └── auth.js          # Authentication helpers
+### Storybook
+
+View and test components in isolation:
+
+```bash
+pnpm storybook
 ```
 
-## User Roles
+Stories are located in `src/stories/`.
 
-### Admin
-- Full access to all projects
-- Can create, edit, and delete projects
-- Can upload builds for any project
-- Can assign managers to projects
+## Fonts
 
-### Manager
-- Can manage assigned projects
-- Can upload builds for assigned projects
-- Can view project details and live URLs
+The app uses [Inter](https://fonts.google.com/specimen/Inter) from Google Fonts as the default font family.
 
-### Client
-- Can view projects they have access to
-- Can access live URLs for accessible projects
-- Limited to viewing only
+```css
+--font-sans: "Inter", sans-serif;
+```
 
-## API Integration
+## Environment Variables
 
-The frontend integrates with the backend API endpoints:
+Create a `.env.local` file for local environment variables:
 
-- `POST /api/auth/login` - User authentication
-- `GET /api/projects` - Fetch user's projects
-- `POST /api/projects` - Create new project
-- `POST /api/projects/:id/upload` - Upload project build
-- `GET /api/projects/:id/live-url` - Get project live URL
+```env
+VITE_API_URL=http://localhost:3000
+```
 
-## Responsive Design
+Access in code:
 
-The dashboard is fully responsive with:
+```typescript
+const apiUrl = import.meta.env.VITE_API_URL;
+```
 
-- **Desktop**: Full sidebar navigation with main content area
-- **Tablet**: Collapsible sidebar with touch-friendly interface
-- **Mobile**: Hamburger menu with overlay sidebar
+## Build & Deployment
 
-## Demo Credentials
+```bash
+# Production build
+pnpm build
 
-For testing purposes, use these demo accounts:
+# Output is in dist/
+```
 
-- **Admin**: admin@example.com / admin123
-- **Manager**: manager@example.com / manager123  
-- **Client**: client@example.com / client123
+The build output is optimized and ready for static hosting.
 
-## Development
-
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run serve` - Preview production build
-
-### Code Style
-
-The project follows modern React patterns:
-
-- Functional components with hooks
-- Context API for state management
-- Custom hooks for reusable logic
-- CSS modules for component styling
-
-## Browser Support
-
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-ISC License
